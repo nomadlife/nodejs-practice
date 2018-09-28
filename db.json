@@ -1,0 +1,30 @@
+{
+  "users": [
+    {
+      "id": "mKO3LOWim",
+      "email": "test@gmail.com",
+      "password": "$2a$10$CXHM/tjj0d.ULVi/ABjkK.BsTyXrMdlwmcq96KPd6L7sMuoY40kD.",
+      "displayName": "tester"
+    },
+    {
+      "id": "OXafBPZze",
+      "email": "test2@gmail.com",
+      "password": "$2a$10$lvO98Bka9dG08FYBhQfvjuCuYgaV5VfvS7AnB2KLTIyIkNPvFsFTq",
+      "displayName": "tester2"
+    }
+  ],
+  "topics": [
+    {
+      "id": "QKjGnM0L9",
+      "title": "test",
+      "description": "test,,,,",
+      "user_id": "mKO3LOWim"
+    },
+    {
+      "id": "ejXuVMntd",
+      "title": "test2",
+      "description": "test2,,,",
+      "user_id": "OXafBPZze"
+    }
+  ]
+}
