@@ -7,6 +7,7 @@ var FileStore = require('session-file-store')(session)
 var flash = require('connect-flash');
 var db = require('./lib/db')
 var helmet = require('helmet');
+var bcrypt = require('bcryptjs');
 app.use(helmet())
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({extended:false}))
@@ -32,7 +33,43 @@ app.get('/flash-display', function(req,res){
   // res.render('index',{messages:req.flash('info')})
 })
 
-var passport = require('./lib/passport')(app)
+var passport = require('passport')
+var LocalStrategy = require('passport-local').Strategy;
+app.use(passport.initialize())
+app.use(passport.session())
+passport.serializeUser(function (user, done) {
+    done(null, user.id)
+});
+passport.deserializeUser(function (id, done) {
+    var user = db.get('users').find({ id: id }).value();
+    done(null, user);
+});
+passport.use(new LocalStrategy(
+    {
+        usernameField: 'email',
+        passwordField: 'pwd'
+    },
+    function (email, password, done) {
+        var user = db.get('users').find({ email: email }).value();
+        if (user) {
+            bcrypt.compare(password, user.password, function(err, result){
+                if(result){
+                    return done(null, user, {
+                        message: 'Welcome'
+                    });
+                }else{
+                    return done(null, false, {
+                        message: 'Invalid password'
+                    });
+                };
+            })
+        } else {
+            return done(null, false, {
+                message: 'Invalid email'
+            });
+        }
+    }
+));
 
 app.get('*',function(request, response, next){
   request.list = db.get('topics').value();
