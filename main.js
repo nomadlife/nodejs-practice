@@ -5,7 +5,16 @@ var compression = require('compression');
 var session = require('express-session')
 var FileStore = require('session-file-store')(session)
 var flash = require('connect-flash');
-var db = require('./lib/db')
+
+var low = require('lowdb');
+var FileSync = require('./node_modules/lowdb/adapters/FileSync');
+var adapter = new FileSync('db.json');
+var db = low(adapter);
+db.defaults({
+    users: [],
+    topics: []
+}).write();
+
 var helmet = require('helmet');
 var bcrypt = require('bcryptjs');
 app.use(helmet())
@@ -28,7 +37,7 @@ app.get('/flash',function(req,res){
 
 app.get('/flash-display', function(req,res){
   var fmsg = req.flash();
-  console.log(fmsg);
+//   console.log(fmsg);
   res.send(fmsg);
   // res.render('index',{messages:req.flash('info')})
 })

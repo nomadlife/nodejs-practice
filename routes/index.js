@@ -1,5 +1,15 @@
 var express = require('express')
 var router = express.Router()
+
+var low = require('lowdb');
+var FileSync = require('../node_modules/lowdb/adapters/FileSync');
+var adapter = new FileSync('db.json');
+var db = low(adapter);
+db.defaults({
+    users: [],
+    topics: []
+}).write();
+
 var template = {
     HTML:function(title, list, body, control, authStatusUI='<a href="/auth/login">login</a>'){
       return `
@@ -11,14 +21,16 @@ var template = {
       </head>
       <body>
         ${authStatusUI}
-        <h1><a href="/">WEB(passport)</a></h1>
+        <h1><a href="/">WEB(reverse)</a></h1>
         ${list}
         ${control}
         ${body}
       </body>
       </html>
       `;
-    },list:function(filelist){
+    },list:function(){
+        db.read();
+      var filelist = db.get('topics').value();
       var list = '<ul>';
       var i = 0;
       while(i < filelist.length){
@@ -56,7 +68,7 @@ router.get('/', function (request, response) {
 
   var title = '';
   var description = 'Hello, Node.js';
-  var list = template.list(request.list);
+  var list = template.list();
   var html = template.HTML(title, list,
     `
       <div>${feedback}</div>

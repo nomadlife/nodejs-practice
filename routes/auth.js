@@ -11,14 +11,15 @@ var template = {
       </head>
       <body>
         ${authStatusUI}
-        <h1><a href="/">WEB(passport)</a></h1>
+        <h1><a href="/">WEB(reverse)</a></h1>
         ${list}
         ${control}
         ${body}
       </body>
       </html>
       `;
-    },list:function(filelist){
+    },list:function(){
+      var filelist = db.get('topics').value();
       var list = '<ul>';
       var i = 0;
       while(i < filelist.length){
@@ -47,7 +48,16 @@ var auth = {
       }
 }
 var shortid = require('shortid');
-var db = require('../lib/db')
+
+var low = require('lowdb');
+var FileSync = require('../node_modules/lowdb/adapters/FileSync');
+var adapter = new FileSync('db.json');
+var db = low(adapter);
+db.defaults({
+    users: [],
+    topics: []
+}).write();
+
 var bcrypt = require('bcryptjs');
 
 module.exports = function (passport) {
@@ -59,7 +69,7 @@ module.exports = function (passport) {
     }
 
     var title = 'WEB - login';
-    var list = template.list(request.list);
+    var list = template.list();
     var html = template.HTML(title, list, `
   <div style="color:red;">${feedback}</div>
   <form action="/auth/login_process" method="post">
@@ -90,7 +100,7 @@ router.get('/register', function (request, response) {
   }
 
   var title = 'user register';
-  var list = template.list(request.list);
+  var list = template.list();
   var html = template.HTML(title, list, `
 <div style="color:red;">${feedback}</div>
 <form action="/auth/register_process" method="post">
