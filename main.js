@@ -81,6 +81,7 @@ passport.use(new LocalStrategy(
 ));
 
 app.get('*',function(request, response, next){
+    db.read();
   request.list = db.get('topics').value();
     next()
 })

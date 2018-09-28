@@ -29,9 +29,8 @@ var template = {
         ${body}
       </body>
       </html>
-      `;
-    },list:function(){
-      var filelist = db.get('topics').value();
+      `; 
+    },list:function(filelist){
       var list = '<ul>';
       var i = 0;
       while(i < filelist.length){
@@ -69,7 +68,7 @@ router.get('/create', function (request, response) {
     return false;
   }
   var title = 'WEB - create';
-  var list = template.list();
+  var list = template.list(request.list);
   var html = template.HTML(title, list, `
       <form action="/topic/create_process" method="post">
         <p><input type="text" name="title" placeholder="title"></p>
@@ -118,7 +117,7 @@ router.get('/update/:pageId', function (request, response) {
 
     var title = topic.title;
     var description = topic.description;
-    var list = template.list();
+    var list = template.list(request.list);
     var html = template.HTML(title, list,
       `
       <form action="/topic/update_process" method="post">
@@ -187,7 +186,7 @@ router.get('/:pageId', function (request, response, next) {
   var sanitizedDescription = sanitizeHtml(topic.description, {
     allowedTags: ['h1']
   });
-  var list = template.list();
+  var list = template.list(request.list);
   var html = template.HTML(sanitizedTitle, list,
     `<h2>${sanitizedTitle}</h2>
     ${sanitizedDescription}

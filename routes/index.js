@@ -28,9 +28,7 @@ var template = {
       </body>
       </html>
       `;
-    },list:function(){
-        db.read();
-      var filelist = db.get('topics').value();
+    },list:function(filelist){
       var list = '<ul>';
       var i = 0;
       while(i < filelist.length){
@@ -68,7 +66,7 @@ router.get('/', function (request, response) {
 
   var title = '';
   var description = 'Hello, Node.js';
-  var list = template.list();
+  var list = template.list(request.list);
   var html = template.HTML(title, list,
     `
       <div>${feedback}</div>

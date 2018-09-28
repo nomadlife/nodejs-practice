@@ -18,8 +18,7 @@ var template = {
       </body>
       </html>
       `;
-    },list:function(){
-      var filelist = db.get('topics').value();
+    },list:function(filelist){
       var list = '<ul>';
       var i = 0;
       while(i < filelist.length){
@@ -69,7 +68,7 @@ module.exports = function (passport) {
     }
 
     var title = 'WEB - login';
-    var list = template.list();
+    var list = template.list(request.list);
     var html = template.HTML(title, list, `
   <div style="color:red;">${feedback}</div>
   <form action="/auth/login_process" method="post">
@@ -100,7 +99,7 @@ router.get('/register', function (request, response) {
   }
 
   var title = 'user register';
-  var list = template.list();
+  var list = template.list(request.list );
   var html = template.HTML(title, list, `
 <div style="color:red;">${feedback}</div>
 <form action="/auth/register_process" method="post">
