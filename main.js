@@ -28,7 +28,8 @@ var template = {
       <body>
         ${authStatusUI}
         <h1><a href="/">WEB(reverse)</a></h1>
-        <a href="/list">list</a>
+        <a href="/list">topics</a>
+        <a href="/list">users</a>
         ${list}
         ${control}
         ${body}
@@ -42,7 +43,7 @@ var template = {
         list = list + `<li><a href="/topic/${filelist[i].id}">${filelist[i].title}</a></li>`;
         i = i + 1;
       }
-      list = list+'</ul>';
+      list = list+'</ul>'; 
       return list;
     }
   }
@@ -56,12 +57,33 @@ var auth = {
       },
       
     statusUI:function(request, response){
-        var authStatusUI = '<a href="/auth/login">login</a> | <a href="/auth/register">Register</a>'
+        var authStatusUI = '<a href="/auth/login">Login</a> | <a href="/auth/register">Register</a>'
         if(this.isOwner(request, response)){
           authStatusUI = `${request.user.displayName}|<a href="/auth/logout">logout</a>`;
         }
         return authStatusUI;
+      },
+    createUI:function(request, response){
+      var authCreateUI = ''
+      if(this.isOwner(request, response)){
+        authCreateUI = `<a href="/topic/create">create</a>`;
       }
+      return authCreateUI;
+    },
+    topicUI:function(request, response, topic){
+      var authTopicUI = '';
+      if(request.user){
+        authTopicUI =  '<br> <a href="/topic/create">create</a>'
+        if(request.user.id === topic.user_id){
+          authTopicUI = authTopicUI + ` <a href="/topic/update/${topic.id}">update</a>
+          <form action="/topic/delete_process" method="post" style="display: inline-block;">
+            <input type="hidden" name="id" value="${topic.id}">
+            <input type="submit" value="delete">
+          </form>`;
+        }
+      }
+      return authTopicUI;
+    }
 }   
 var shortid = require('shortid');
 
@@ -149,10 +171,10 @@ app.get('/', function (request, response) {
     var list = '';
     var html = template.HTML(title, list,
       `
-        <div>${feedback}</div>
-        <h2>${title}</h2>${description}
-        <img src="/images/hello.jpg" style="width:300px; display:block; margin-top:10px">`,
-      `<a href="/topic/create">create</a>`,
+      <div>${feedback}</div>
+      <h2>${title}</h2>${description}
+      <img src="/images/hello.jpg" style="width:300px; display:block; margin-top:10px">`,
+      '',
       auth.statusUI(request, response)
     );
     response.send(html)
@@ -169,11 +191,8 @@ app.get('/', function (request, response) {
     var description = 'topic list';
     var list = template.list(request.list);
     var html = template.HTML(title, list,
-      `
-        <div>${feedback}</div>
-        <h2>${title}</h2>${description}
-        <img src="/images/hello.jpg" style="width:300px; display:block; margin-top:10px">`,
-      `<a href="/topic/create">create</a>`,
+      `<div>${feedback}</div><h2>${title}</h2>${description}`,
+      auth.createUI(request, response),
       auth.statusUI(request, response)
     );
     response.send(html)
@@ -193,7 +212,7 @@ app.get('/', function (request, response) {
             <textarea name="description" placeholder="description"></textarea>
           </p>
           <p>
-            <input type="submit">
+            <input type="submit" value="create">
           </p>
         </form>
       `, '', auth.statusUI(request, response));
@@ -241,7 +260,7 @@ app.get('/', function (request, response) {
         <input type="hidden" name="id" value="${topic.id}">
         <p><input type="text" name="title" placeholder="title" value="${title}"></p>
         <p><textarea name="description" placeholder="description">${description}</textarea></p>
-        <p><input type="submit"></p>
+        <p><input type="submit" value="update"></p>
       </form>
       `,
       `<a href="/topic/create">create</a> <a href="/topic/update/${topic.id}">update</a>`,
@@ -294,6 +313,7 @@ app.get('/', function (request, response) {
     var user = db.get('users').find({
       id: topic.user_id
     }).value();
+    //console.log(topic);
     
     var sanitizedTitle = sanitizeHtml(topic.title);
     var sanitizedDescription = sanitizeHtml(topic.description, {
@@ -305,12 +325,7 @@ app.get('/', function (request, response) {
       ${sanitizedDescription}
       <p>by ${user.displayName}</p>
       `,
-      ` <a href="/topic/create">create</a>
-        <a href="/topic/update/${topic.id}">update</a>
-        <form action="/topic/delete_process" method="post">
-          <input type="hidden" name="id" value="${topic.id}">
-          <input type="submit" value="delete">
-        </form>`,
+      auth.topicUI(request, response, topic),
       auth.statusUI(request, response)
     );
     response.send(html);
@@ -324,7 +339,7 @@ app.get('/auth/login', function (request, response) {
     }
 
     var title = 'login';
-    var list = template.list(request.list);
+    var list = '';
     var html = template.HTML(title, list, `
   <div style="color:red;">${feedback}</div>
   <form action="/auth/login_process" method="post">
@@ -355,7 +370,7 @@ app.get('/auth/register', function (request, response) {
   }
 
   var title = 'user register';
-  var list = template.list(request.list );
+  var list = '';
   var html = template.HTML(title, list, `
 <div style="color:red;">${feedback}</div>
 <form action="/auth/register_process" method="post">
