@@ -31,8 +31,8 @@ var template = {
         <a href="/topic/list">topics</a>
         <a href="/user/list">users</a>
         ${list}
-        ${control}
         ${body}
+        ${control}
       </body>
       </html>
       `;
@@ -207,10 +207,9 @@ app.get('/', function (request, response) {
     if (fmsg.success) {
       feedback = fmsg.success[0];
     }
-    var topic = db.get('topics').find({
+    var topic = db.get('topics').filter({
       user_id: request.params.userId
     }).value();
-    console.log(request.params.userId, topic);
     var title = '';
     var description = 'topic list';
     var list = template.list(topic);
@@ -360,7 +359,7 @@ app.get('/', function (request, response) {
     var sanitizedDescription = sanitizeHtml(topic.description, {
       allowedTags: ['h1']
     });
-    var list = template.list(request.list);
+    var list = '';
     var html = template.HTML(sanitizedTitle, list,
       `<h2>${sanitizedTitle}</h2>
       ${sanitizedDescription}
