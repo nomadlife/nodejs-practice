@@ -1,1 +1,1 @@
-![alt text](https://raw.githubusercontent.com/nomadlife/nodejs_ractice/master/public/images/info.png)
+![alt text](https://raw.githubusercontent.com/nomadlife/nodejs_practice/master/public/images/info.png)
