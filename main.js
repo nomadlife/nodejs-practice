@@ -29,7 +29,7 @@ var template = {
         ${authStatusUI}
         <h1><a href="/">WEB(reverse)</a></h1>
         <a href="/topic/list">topics</a>
-        <a href="/user/list">users</a>
+        <a href="/user/list">users</a><br>
         ${list}
         ${body}
         ${control}
@@ -37,13 +37,17 @@ var template = {
       </html>
       `;
     },list:function(filelist){
-      var list = '<ul>';
+      var list = `<br><table border='1' style="border: 1px solid black;border-collapse:collapse;">
+      <tr><th>topic</th><th>user</th></tr>`;
       var i = 0;
       while(filelist && i < filelist.length){
-        list = list + `<li><a href="/topic/${filelist[i].id}">${filelist[i].title}</a></li>`;
+        list = list + `<tr">
+        <td><a href="/topic/${filelist[i].id}">${filelist[i].title}</a></td>
+        <td><a href="/user/${filelist[i].user_id}">${filelist[i].user_id}</a></td>
+        </tr>`;
         i = i + 1;
       }
-      list = list+'</ul>'; 
+      list = list+'</table>'; 
       return list;
     },
     userlist:function(filelist){
@@ -168,14 +172,9 @@ app.get('/', function (request, response) {
     if (fmsg.success) {
       feedback = fmsg.success[0];
     }
-  
-    var title = '';
-    var description = 'Hello, Node.js';
-    var list = '';
-    var html = template.HTML(title, list,
-      `
-      <div>${feedback}</div>
-      <h2>${title}</h2>${description}
+    var html = template.HTML('', '',
+      `<div>${feedback}</div>
+      <h2>${title}</h2>Hello, Node.js
       <img src="/images/hello.jpg" style="width:300px; display:block; margin-top:10px">`,
       '',
       auth.statusUI(request, response)
@@ -211,7 +210,7 @@ app.get('/', function (request, response) {
       user_id: request.params.userId
     }).value();
     var title = '';
-    var description = 'topic list';
+    var description = '';
     var list = template.list(topic);
     var html = template.HTML(title, list,
       `<div>${feedback}</div><h2>${title}</h2>${description}`,
@@ -228,7 +227,7 @@ app.get('/', function (request, response) {
       feedback = fmsg.success[0];
     }
     var title = '';
-    var description = 'topic list';
+    var description = '';
     var list = template.list(request.list);
     var html = template.HTML(title, list,
       `<div>${feedback}</div><h2>${title}</h2>${description}`,
