@@ -1,5 +1,4 @@
 var express = require('express')
- //var router = express.Router()
 var app = express()
 var bodyParser = require('body-parser');
 var compression = require('compression');
@@ -23,12 +22,13 @@ var template = {
       <!doctype html>
       <html>
       <head>
-        <title>WEB1 - ${title}</title>
+        <title>WEB  - ${title}</title>
         <meta charset="utf-8">
       </head>
       <body>
         ${authStatusUI}
         <h1><a href="/">WEB(reverse)</a></h1>
+        <a href="/list">list</a>
         ${list}
         ${control}
         ${body}
@@ -87,7 +87,6 @@ app.get('/flash',function(req,res){
 
 app.get('/flash-display', function(req,res){
   var fmsg = req.flash();
-//   console.log(fmsg);
   res.send(fmsg);
   // res.render('index',{messages:req.flash('info')})
 })
@@ -147,6 +146,27 @@ app.get('/', function (request, response) {
   
     var title = '';
     var description = 'Hello, Node.js';
+    var list = '';
+    var html = template.HTML(title, list,
+      `
+        <div>${feedback}</div>
+        <h2>${title}</h2>${description}
+        <img src="/images/hello.jpg" style="width:300px; display:block; margin-top:10px">`,
+      `<a href="/topic/create">create</a>`,
+      auth.statusUI(request, response)
+    );
+    response.send(html)
+  })
+
+  app.get('/list', function (request, response) {
+    var fmsg = request.flash();
+    var feedback = '';
+    if (fmsg.success) {
+      feedback = fmsg.success[0];
+    }
+  
+    var title = '';
+    var description = 'topic list';
     var list = template.list(request.list);
     var html = template.HTML(title, list,
       `
@@ -205,29 +225,29 @@ app.get('/', function (request, response) {
       response.redirect('/auth/login');
       return false;
     }
+
     var topic = db.get('topics').find({id:request.params.pageId}).value();
-     
     if(topic.user_id !== request.user.id){
       request.flash('error','not yours!');
       return response.redirect('/');
     } 
   
-      var title = topic.title;
-      var description = topic.description;
-      var list = template.list(request.list);
-      var html = template.HTML(title, list,
-        `
-        <form action="/topic/update_process" method="post">
-          <input type="hidden" name="id" value="${topic.id}">
-          <p><input type="text" name="title" placeholder="title" value="${title}"></p>
-          <p><textarea name="description" placeholder="description">${description}</textarea></p>
-          <p><input type="submit"></p>
-        </form>
-        `,
-        `<a href="/topic/create">create</a> <a href="/topic/update/${topic.id}">update</a>`,
-        auth.statusUI(request, response)
-      );
-      response.send(html);
+    var title = topic.title;
+    var description = topic.description;
+    var list = template.list(request.list);
+    var html = template.HTML(title, list,
+      `
+      <form action="/topic/update_process" method="post">
+        <input type="hidden" name="id" value="${topic.id}">
+        <p><input type="text" name="title" placeholder="title" value="${title}"></p>
+        <p><textarea name="description" placeholder="description">${description}</textarea></p>
+        <p><input type="submit"></p>
+      </form>
+      `,
+      `<a href="/topic/create">create</a> <a href="/topic/update/${topic.id}">update</a>`,
+      auth.statusUI(request, response)
+    );
+    response.send(html);
   })
   
   app.post('/topic/update_process', function (request, response) {
@@ -286,11 +306,11 @@ app.get('/', function (request, response) {
       <p>by ${user.displayName}</p>
       `,
       ` <a href="/topic/create">create</a>
-              <a href="/topic/update/${topic.id}">update</a>
-              <form action="/topic/delete_process" method="post">
-                <input type="hidden" name="id" value="${topic.id}">
-                <input type="submit" value="delete">
-              </form>`,
+        <a href="/topic/update/${topic.id}">update</a>
+        <form action="/topic/delete_process" method="post">
+          <input type="hidden" name="id" value="${topic.id}">
+          <input type="submit" value="delete">
+        </form>`,
       auth.statusUI(request, response)
     );
     response.send(html);
@@ -303,7 +323,7 @@ app.get('/auth/login', function (request, response) {
       feedback = fmsg.error[0];
     }
 
-    var title = 'WEB - login';
+    var title = 'login';
     var list = template.list(request.list);
     var html = template.HTML(title, list, `
   <div style="color:red;">${feedback}</div>
