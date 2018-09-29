@@ -28,8 +28,8 @@ var template = {
       <body>
         ${authStatusUI}
         <h1><a href="/">WEB(reverse)</a></h1>
-        <a href="/list">topics</a>
-        <a href="/list">users</a>
+        <a href="/topic/list">topics</a>
+        <a href="/user/list">users</a>
         ${list}
         ${control}
         ${body}
@@ -39,8 +39,18 @@ var template = {
     },list:function(filelist){
       var list = '<ul>';
       var i = 0;
-      while(i < filelist.length){
+      while(filelist && i < filelist.length){
         list = list + `<li><a href="/topic/${filelist[i].id}">${filelist[i].title}</a></li>`;
+        i = i + 1;
+      }
+      list = list+'</ul>'; 
+      return list;
+    },
+    userlist:function(filelist){
+      var list = '<ul>';
+      var i = 0;
+      while(i < filelist.length){
+        list = list + `<li><a href="/user/${filelist[i].id}">${filelist[i].displayName}</a></li>`;
         i = i + 1;
       }
       list = list+'</ul>'; 
@@ -173,13 +183,51 @@ app.get('/', function (request, response) {
     response.send(html)
   })
 
-  app.get('/list', function (request, response) {
+  app.get('/user/list', function (request, response) {
     var fmsg = request.flash();
     var feedback = '';
     if (fmsg.success) {
       feedback = fmsg.success[0];
     }
-  
+    var users = db.get('users').value();
+    var title = '';
+    var description = 'topic list';
+    var list = template.userlist(users);
+    var html = template.HTML(title, list,
+      `<div>${feedback}</div><h2>${title}</h2>${description}`,
+      '',
+      auth.statusUI(request, response)
+    );
+    response.send(html)
+  })
+
+  app.get('/user/:userId', function (request, response) {
+    var fmsg = request.flash();
+    var feedback = '';
+    if (fmsg.success) {
+      feedback = fmsg.success[0];
+    }
+    var topic = db.get('topics').find({
+      user_id: request.params.userId
+    }).value();
+    console.log(request.params.userId, topic);
+    var title = '';
+    var description = 'topic list';
+    var list = template.list(topic);
+    var html = template.HTML(title, list,
+      `<div>${feedback}</div><h2>${title}</h2>${description}`,
+      '',
+      auth.statusUI(request, response)
+    );
+    response.send(html)
+  })
+
+  app.get('/topic/list', function (request, response) {
+    var fmsg = request.flash();
+    var feedback = '';
+    if (fmsg.success) {
+      feedback = fmsg.success[0];
+    }
     var title = '';
     var description = 'topic list';
     var list = template.list(request.list);
@@ -256,7 +304,7 @@ app.get('/', function (request, response) {
         <p><input type="submit" value="update"></p>
       </form>
       `,
-      `<a href="/topic/create">create</a> <a href="/topic/update/${topic.id}">update</a>`,
+      '',
       auth.statusUI(request, response)
     );
     response.send(html);
