@@ -174,7 +174,7 @@ app.get('/', function (request, response) {
     }
     var html = template.HTML('', '',
       `<div>${feedback}</div>
-      <h2>${title}</h2>Hello, Node.js
+      <h2></h2>Hello, Node.js
       <img src="/images/hello.jpg" style="width:300px; display:block; margin-top:10px">`,
       '',
       auth.statusUI(request, response)
