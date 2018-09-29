@@ -1,0 +1,1 @@
+![alt text](https://raw.githubusercontent.com/nomadlife/nodejs_ractice/master/public/images/info.png)
