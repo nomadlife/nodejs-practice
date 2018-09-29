@@ -4,19 +4,19 @@
       "id": "mKO3LOWim",
       "email": "test@gmail.com",
       "password": "$2a$10$CXHM/tjj0d.ULVi/ABjkK.BsTyXrMdlwmcq96KPd6L7sMuoY40kD.",
-      "displayName": "tester"
+      "displayName": "user"
     },
     {
       "id": "OXafBPZze",
       "email": "test2@gmail.com",
       "password": "$2a$10$lvO98Bka9dG08FYBhQfvjuCuYgaV5VfvS7AnB2KLTIyIkNPvFsFTq",
-      "displayName": "tester2"
+      "displayName": "user2"
     },
     {
       "id": "mTyFPkjTJ",
       "email": "test3@gmail.com",
       "password": "$2a$10$pjZBmo2AY3VpnYZ/dvbUq.Ymw1u9S.a.EUTAfCyu.iNCpUFnmp2xW",
-      "displayName": "tester3"
+      "displayName": "user3"
     }
   ],
   "topics": [
