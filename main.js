@@ -63,18 +63,11 @@ var auth = {
         }
         return authStatusUI;
       },
-    createUI:function(request, response){
-      var authCreateUI = ''
-      if(this.isOwner(request, response)){
-        authCreateUI = `<a href="/topic/create">create</a>`;
-      }
-      return authCreateUI;
-    },
     topicUI:function(request, response, topic){
       var authTopicUI = '';
       if(request.user){
         authTopicUI =  '<br> <a href="/topic/create">create</a>'
-        if(request.user.id === topic.user_id){
+        if((topic) && (request.user.id === topic.user_id)){
           authTopicUI = authTopicUI + ` <a href="/topic/update/${topic.id}">update</a>
           <form action="/topic/delete_process" method="post" style="display: inline-block;">
             <input type="hidden" name="id" value="${topic.id}">
@@ -192,7 +185,7 @@ app.get('/', function (request, response) {
     var list = template.list(request.list);
     var html = template.HTML(title, list,
       `<div>${feedback}</div><h2>${title}</h2>${description}`,
-      auth.createUI(request, response),
+      auth.topicUI(request, response),
       auth.statusUI(request, response)
     );
     response.send(html)
